@@ -3,11 +3,12 @@ interface Props {
   y1: number
   x2: number
   y2: number
-  id: string
-  onDoubleClick?: (wireId: string) => void
+  netId: string
+  segId: string
+  onDoubleClick?: (netId: string, segId: string) => void
 }
 
-export function WireElement({ x1, y1, x2, y2, id, onDoubleClick }: Props) {
+export function WireElement({ x1, y1, x2, y2, netId, segId, onDoubleClick }: Props) {
   const dx = Math.abs(x2 - x1) * 0.5
   const d = `M ${x1} ${y1} C ${x1 + dx} ${y1}, ${x2 - dx} ${y2}, ${x2} ${y2}`
 
@@ -20,7 +21,7 @@ export function WireElement({ x1, y1, x2, y2, id, onDoubleClick }: Props) {
         stroke="transparent"
         strokeWidth={12}
         style={{ cursor: 'pointer' }}
-        onDoubleClick={onDoubleClick ? () => onDoubleClick(id) : undefined}
+        onDoubleClick={onDoubleClick ? () => onDoubleClick(netId, segId) : undefined}
       />
       <path d={d} fill="none" stroke="#475569" strokeWidth={1.5} style={{ pointerEvents: 'none' }} />
     </g>

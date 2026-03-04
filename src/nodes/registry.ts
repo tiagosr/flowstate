@@ -1,6 +1,7 @@
 import { GraphNode } from '../types/graph'
 import { makeAndGate, makeSignalIn, makeSignalOut } from './logic'
 import { makeModuleInstance } from './module'
+import { makeNumberConst, makeBoolConst, makeStringConst } from './constants'
 
 export interface NodeTypeEntry {
   label: string
@@ -13,6 +14,9 @@ export const nodeRegistry: Record<string, NodeTypeEntry> = {
   'logic/signal-in':  { label: 'Wire In',     factory: makeSignalIn },
   'logic/signal-out': { label: 'Wire Out',    factory: makeSignalOut },
   'module/instance':  { label: 'Instance',    factory: makeModuleInstance },
+  'const/number':     { label: 'Number',      factory: makeNumberConst },
+  'const/bool':       { label: 'Boolean',     factory: makeBoolConst },
+  'const/string':     { label: 'String',      factory: makeStringConst },
 }
 
 /** Returns the registry grouped by category. */

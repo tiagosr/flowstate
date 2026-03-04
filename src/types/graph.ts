@@ -15,17 +15,27 @@ export interface GraphNode {
   properties: Record<string, unknown>
 }
 
-export interface Wire {
+export type SegEndpoint =
+  | { kind: 'port'; nodeId: string; portId: string }
+  | { kind: 'junction'; junctionId: string }
+
+export interface Segment {
   id: string
-  fromNodeId: string
-  fromPortId: string
-  toNodeId: string
-  toPortId: string
+  from: SegEndpoint
+  to: SegEndpoint
 }
 
-export interface GraphState {
-  nodes: GraphNode[]
-  wires: Wire[]
+export interface Junction {
+  id: string
+  x: number
+  y: number
+}
+
+export interface Net {
+  id: string
+  portRefs: Array<{ nodeId: string; portId: string }>
+  junctions: Junction[]
+  segments: Segment[]
 }
 
 /** The absolute position of a port on the canvas, derived from its node position. */

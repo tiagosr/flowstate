@@ -7,6 +7,7 @@ interface Props {
   onPointerDown?: (e: React.PointerEvent, port: Port) => void
   onPointerUp?: (e: React.PointerEvent, port: Port) => void
   highlighted?: boolean
+  hideLabel?: boolean
 }
 
 const labelOffset = PORT_RADIUS + 4
@@ -18,7 +19,7 @@ const labelProps: Record<Port['side'], { x: number; y: number; textAnchor: 'star
   south: { x: 0,            y: -labelOffset,  textAnchor: 'middle' },
 }
 
-export function PortElement({ port, x, y, onPointerDown, onPointerUp, highlighted }: Props) {
+export function PortElement({ port, x, y, onPointerDown, onPointerUp, highlighted, hideLabel }: Props) {
   const lp = labelProps[port.side]
   return (
     <g
@@ -33,17 +34,19 @@ export function PortElement({ port, x, y, onPointerDown, onPointerUp, highlighte
         stroke={highlighted ? '#93c5fd' : '#64748b'}
         strokeWidth={1.5}
       />
-      <text
-        x={lp.x}
-        y={lp.y}
-        fontSize={10}
-        fill="#94a3b8"
-        textAnchor={lp.textAnchor}
-        fontFamily="monospace"
-        style={{ userSelect: 'none', pointerEvents: 'none' }}
-      >
-        {port.name}
-      </text>
+      {!hideLabel && (
+        <text
+          x={lp.x}
+          y={lp.y}
+          fontSize={10}
+          fill="#94a3b8"
+          textAnchor={lp.textAnchor}
+          fontFamily="monospace"
+          style={{ userSelect: 'none', pointerEvents: 'none' }}
+        >
+          {port.name}
+        </text>
+      )}
     </g>
   )
 }
