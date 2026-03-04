@@ -32,8 +32,8 @@ export function getNodeWidth(node: GraphNode): number {
   const northCount = node.ports.filter((p) => p.side === 'north').length
   const southCount = node.ports.filter((p) => p.side === 'south').length
 
-  const fromOpposingPorts = 2 * inset + horizontalMax * 2 + NODE_MARGIN
-  const fromLabel = node.label.length * NODE_LABEL_CHAR_WIDTH + 2 * NODE_MARGIN
+  const fromOpposingPorts = 2 * inset + 2 * horizontalMax + NODE_MARGIN
+  const fromLabel = node.label.length * NODE_LABEL_CHAR_WIDTH + 2 * horizontalMax + 2 * NODE_MARGIN
   const fromNorthSouth = NODE_MARGIN + Math.max(northCount, southCount) * PORT_HEIGHT
 
   return Math.max(fromOpposingPorts, fromLabel, fromNorthSouth, NODE_MIN_WIDTH)
