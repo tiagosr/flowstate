@@ -7,6 +7,7 @@ interface Props {
   onPortPointerDown: (e: React.PointerEvent, port: Port, nodeId: string) => void
   onPortPointerUp: (e: React.PointerEvent, port: Port, nodeId: string) => void
   pendingFromPortId?: string
+  selected?: boolean
 }
 
 // Approximate character widths for monospace fonts
@@ -61,7 +62,7 @@ export function getPortOffset(node: GraphNode, port: Port): { x: number; y: numb
   }
 }
 
-export function NodeElement({ node, onPointerDown, onPortPointerDown, onPortPointerUp, pendingFromPortId }: Props) {
+export function NodeElement({ node, onPointerDown, onPortPointerDown, onPortPointerUp, pendingFromPortId, selected }: Props) {
   const width = getNodeWidth(node)
   const height = getNodeHeight(node)
 
@@ -76,8 +77,8 @@ export function NodeElement({ node, onPointerDown, onPortPointerDown, onPortPoin
         height={height}
         rx={3}
         fill="#0f172a"
-        stroke="#334155"
-        strokeWidth={1}
+        stroke={selected ? '#60a5fa' : '#334155'}
+        strokeWidth={selected ? 2 : 1}
         style={{ cursor: 'grab' }}
         onPointerDown={(e) => onPointerDown(e, node.id)}
       />

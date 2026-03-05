@@ -15,6 +15,7 @@ interface GraphStore {
   moveJunction: (netId: string, junctionId: string, x: number, y: number) => void
   removeNet: (netId: string) => void
   removeSegment: (netId: string, segId: string) => void
+  removeJunction: (netId: string, junctionId: string) => void
 }
 
 export const useGraphStore = create<GraphStore>((set) => ({
@@ -115,6 +116,41 @@ export const useGraphStore = create<GraphStore>((set) => ({
                 segments: newSegments,
                 junctions: net.junctions.filter((j) =>
                   allEps.some((ep) => ep.kind === 'junction' && ep.junctionId === j.id),
+                ),
+                portRefs: net.portRefs.filter((p) =>
+                  allEps.some(
+                    (ep) => ep.kind === 'port' && ep.nodeId === p.nodeId && ep.portId === p.portId,
+                  ),
+                ),
+              },
+        ),
+      }
+    }),
+
+  removeJunction: (netId, junctionId) =>
+    set((s) => {
+      const net = s.nets.find((n) => n.id === netId)
+      if (!net) return s
+      const newSegments = net.segments.filter(
+        (seg) =>
+          !(seg.from.kind === 'junction' && seg.from.junctionId === junctionId) &&
+          !(seg.to.kind === 'junction' && seg.to.junctionId === junctionId),
+      )
+      if (newSegments.length === 0) {
+        return { nets: s.nets.filter((n) => n.id !== netId) }
+      }
+      const allEps = newSegments.flatMap((seg) => [seg.from, seg.to])
+      return {
+        nets: s.nets.map((n) =>
+          n.id !== netId
+            ? n
+            : {
+                ...n,
+                segments: newSegments,
+                junctions: net.junctions.filter(
+                  (j) =>
+                    j.id !== junctionId &&
+                    allEps.some((ep) => ep.kind === 'junction' && ep.junctionId === j.id),
                 ),
                 portRefs: net.portRefs.filter((p) =>
                   allEps.some(

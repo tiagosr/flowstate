@@ -1,4 +1,4 @@
-import { GraphNode, Port, PORT_RADIUS } from '../types/graph'
+import { GraphNode, Port } from '../types/graph'
 import { getNodeWidth, getNodeHeight, getPortOffset } from './NodeElement'
 import { PortElement } from './Port'
 
@@ -8,6 +8,7 @@ interface Props {
   onPortPointerDown: (e: React.PointerEvent, port: Port, nodeId: string) => void
   onPortPointerUp: (e: React.PointerEvent, port: Port, nodeId: string) => void
   pendingFromPortId?: string
+  selected?: boolean
 }
 
 const typeTheme: Record<string, { body: string; border: string; text: string }> = {
@@ -24,6 +25,7 @@ export function ConstantNode({
   onPortPointerDown,
   onPortPointerUp,
   pendingFromPortId,
+  selected,
 }: Props) {
   const width = getNodeWidth(node)
   const height = getNodeHeight(node)
@@ -45,8 +47,8 @@ export function ConstantNode({
         height={height}
         rx={4}
         fill={theme.body}
-        stroke={theme.border}
-        strokeWidth={1.5}
+        stroke={selected ? '#60a5fa' : theme.border}
+        strokeWidth={selected ? 2 : 1.5}
         style={{ cursor: 'grab' }}
         onPointerDown={(e) => onPointerDown(e, node.id)}
       />
