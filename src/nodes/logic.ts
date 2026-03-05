@@ -16,6 +16,71 @@ export function makeAndGate(id: string, x: number, y: number): GraphNode {
   }
 }
 
+export function makeOrGate(id: string, x: number, y: number): GraphNode {
+  return {
+    id,
+    type: 'logic/or',
+    label: 'OR',
+    x,
+    y,
+    properties: { bits: 1 },
+    ports: [
+      { id: `${id}-a`, name: 'a', side: 'west', type: 'bit' },
+      { id: `${id}-b`, name: 'b', side: 'west', type: 'bit' },
+      { id: `${id}-out`, name: 'out', side: 'east', type: 'bit' },
+    ],
+  }
+}
+
+export function makeNandGate(id: string, x: number, y: number): GraphNode {
+  return {
+    id,
+    type: 'logic/nand',
+    label: 'NAND',
+    x,
+    y,
+    properties: { bits: 1 },
+    ports: [
+      { id: `${id}-a`, name: 'a', side: 'west', type: 'bit' },
+      { id: `${id}-b`, name: 'b', side: 'west', type: 'bit' },
+      { id: `${id}-out`, name: 'out', side: 'east', type: 'bit' },
+    ],
+  }
+}
+
+export function makeNorGate(id: string, x: number, y: number): GraphNode {
+  return {
+    id,
+    type: 'logic/nor',
+    label: 'NOR',
+    x,
+    y,
+    properties: { bits: 1 },
+    ports: [
+      { id: `${id}-a`, name: 'a', side: 'west', type: 'bit' },
+      { id: `${id}-b`, name: 'b', side: 'west', type: 'bit' },
+      { id: `${id}-out`, name: 'out', side: 'east', type: 'bit' },
+    ],
+  }
+}
+
+export function makeXorGate(id: string, x: number, y: number): GraphNode {
+  return {
+    id,
+    type: 'logic/xor',
+    label: 'XOR',
+    x,
+    y,
+    properties: { bits: 1 },
+    ports: [
+      { id: `${id}-a`, name: 'a', side: 'west', type: 'bit' },
+      { id: `${id}-b`, name: 'b', side: 'west', type: 'bit' },
+      { id: `${id}-out`, name: 'out', side: 'east', type: 'bit' },
+    ],
+  }
+}
+
+
 export function makeSignalIn(id: string, x: number, y: number): GraphNode {
   return {
     id,

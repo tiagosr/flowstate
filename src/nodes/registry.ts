@@ -1,5 +1,5 @@
 import { GraphNode } from '../types/graph'
-import { makeAndGate, makeSignalIn, makeSignalOut } from './logic'
+import { makeAndGate, makeNandGate, makeNorGate, makeOrGate, makeSignalIn, makeSignalOut, makeXorGate } from './logic'
 import { makeModuleInstance } from './module'
 import { makeNumberConst, makeBoolConst, makeStringConst } from './constants'
 
@@ -11,6 +11,10 @@ export interface NodeTypeEntry {
 // Keys are "category/type" — the slash is used to group into directories
 export const nodeRegistry: Record<string, NodeTypeEntry> = {
   'logic/and':        { label: 'AND Gate',    factory: makeAndGate },
+  'logic/or':         { label: 'OR Gate',     factory: makeOrGate },
+  'logic/nand':       { label: 'NAND Gate',   factory: makeNandGate },
+  'logic/nor':        { label: 'NOR Gate',    factory: makeNorGate },
+  'logic/xor':        { label: 'XOR Gate',    factory: makeXorGate },
   'logic/signal-in':  { label: 'Wire In',     factory: makeSignalIn },
   'logic/signal-out': { label: 'Wire Out',    factory: makeSignalOut },
   'module/instance':  { label: 'Instance',    factory: makeModuleInstance },

@@ -21,9 +21,8 @@ interface PendingWire {
   mouseY: number
 }
 
-let nextId = 1
 function uid() {
-  return String(nextId++)
+  return crypto.randomUUID()
 }
 
 function getPortPosition(node: GraphNode, portId: string): PortPosition {
