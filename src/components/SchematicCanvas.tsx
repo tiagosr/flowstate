@@ -48,6 +48,37 @@ function closestPointOnSeg(
   return { x: x1 + t * dx, y: y1 + t * dy }
 }
 
+function portSideTangent(side: Port['side']): { tx: number; ty: number } {
+  switch (side) {
+    case 'east':  return { tx:  1, ty:  0 }
+    case 'west':  return { tx: -1, ty:  0 }
+    case 'north': return { tx:  0, ty: -1 }
+    case 'south': return { tx:  0, ty:  1 }
+  }
+}
+
+/** Returns the exit tangent (unit vector pointing away from this endpoint toward the wire). */
+function getEndpointTangent(
+  ep: SegEndpoint,
+  otherPos: { x: number; y: number },
+  net: Net,
+  nodes: GraphNode[],
+): { tx: number; ty: number } {
+  if (ep.kind === 'port') {
+    const node = nodes.find((n) => n.id === ep.nodeId)
+    const port = node?.ports.find((p) => p.id === ep.portId)
+    return port ? portSideTangent(port.side) : { tx: 1, ty: 0 }
+  }
+  const j = net.junctions.find((j) => j.id === ep.junctionId)
+  if (!j) return { tx: 1, ty: 0 }
+  const dx = otherPos.x - j.x
+  const dy = otherPos.y - j.y
+  if (dx === 0 && dy === 0) return { tx: 1, ty: 0 }
+  return Math.abs(dx) >= Math.abs(dy)
+    ? { tx: dx > 0 ? 1 : -1, ty: 0 }
+    : { tx: 0, ty: dy > 0 ? 1 : -1 }
+}
+
 export function SchematicCanvas() {
   const { nodes, nets, addNode, moveNode, moveJunction, addNet, updateNet, mergeNets, removeSegment, patchNode } =
     useGraphStore()
@@ -398,13 +429,15 @@ export function SchematicCanvas() {
             net.segments.map((seg) => {
               const ep = segmentEndpoints(net, seg)
               if (!ep) return null
+              const t1 = getEndpointTangent(seg.from, ep.to, net, nodes)
+              const t2 = getEndpointTangent(seg.to, ep.from, net, nodes)
               return (
                 <WireElement
                   key={seg.id}
                   netId={net.id}
                   segId={seg.id}
-                  x1={ep.from.x} y1={ep.from.y}
-                  x2={ep.to.x} y2={ep.to.y}
+                  x1={ep.from.x} y1={ep.from.y} tx1={t1.tx} ty1={t1.ty}
+                  x2={ep.to.x} y2={ep.to.y} tx2={t2.tx} ty2={t2.ty}
                   onDoubleClick={removeSegment}
                 />
               )
@@ -448,20 +481,23 @@ export function SchematicCanvas() {
           )}
         </g>
 
-        {pw && (
-          <path
-            d={
-              pending?.fromSide === 'north' || pending?.fromSide === 'south'
-                ? `M ${pw.from.x} ${pw.from.y} C ${pw.from.x} ${pw.from.y + 60}, ${pw.to.x} ${pw.to.y - 60}, ${pw.to.x} ${pw.to.y}`
-                : `M ${pw.from.x} ${pw.from.y} C ${pw.from.x + 60} ${pw.from.y}, ${pw.to.x - 60} ${pw.to.y}, ${pw.to.x} ${pw.to.y}`
-            }
-            fill="none"
-            stroke="#60a5fa"
-            strokeWidth={1.5}
-            strokeDasharray="4 3"
-            style={{ pointerEvents: 'none' }}
-          />
-        )}
+        {pw && pending && (() => {
+          const { tx, ty } = portSideTangent(pending.fromSide)
+          const cx1 = pw.from.x + tx * 60
+          const cy1 = pw.from.y + ty * 60
+          const cx2 = pw.to.x - tx * 60
+          const cy2 = pw.to.y - ty * 60
+          return (
+            <path
+              d={`M ${pw.from.x} ${pw.from.y} C ${cx1} ${cy1}, ${cx2} ${cy2}, ${pw.to.x} ${pw.to.y}`}
+              fill="none"
+              stroke="#60a5fa"
+              strokeWidth={1.5}
+              strokeDasharray="4 3"
+              style={{ pointerEvents: 'none' }}
+            />
+          )
+        })()}
       </svg>
 
       {editingConst && (
