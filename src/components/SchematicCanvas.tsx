@@ -136,6 +136,7 @@ export function SchematicCanvas() {
   const lastPan = useRef({ x: 0, y: 0 })
   const isDragSelecting = useRef(false)
   const dragSelectStart = useRef({ x: 0, y: 0 })
+  const lastNodeClick = useRef<{ nodeId: string; time: number } | null>(null)
 
   // Spacebar → pan mode
   useEffect(() => {
@@ -424,13 +425,22 @@ export function SchematicCanvas() {
       e.stopPropagation()
       const node = nodes.find((n) => n.id === nodeId)!
 
-      if (e.detail >= 2 && node.type.startsWith('const/') && node.type !== 'const/bool') {
+      const now = Date.now()
+      const isDoubleClick =
+        node.type.startsWith('const/') &&
+        node.type !== 'const/bool' &&
+        lastNodeClick.current?.nodeId === nodeId &&
+        now - lastNodeClick.current.time < 400
+      lastNodeClick.current = { nodeId, time: now }
+
+      if (isDoubleClick) {
         setEditingConst({
           nodeId,
           value: String(node.properties.value ?? ''),
           screenX: e.clientX,
           screenY: e.clientY,
         })
+        lastNodeClick.current = null
         return
       }
 
@@ -683,32 +693,39 @@ export function SchematicCanvas() {
       </svg>
 
       {editingConst && (
-        <input
-          autoFocus
-          type={nodes.find((n) => n.id === editingConst.nodeId)?.type === 'const/number' ? 'number' : 'text'}
-          value={editingConst.value}
-          onChange={(e) => setEditingConst((s) => s && { ...s, value: e.target.value })}
-          onBlur={commitConstEdit}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter') commitConstEdit()
-            if (e.key === 'Escape') setEditingConst(null)
-          }}
-          style={{
-            position: 'fixed',
-            left: editingConst.screenX,
-            top: editingConst.screenY,
-            width: 120,
-            background: '#0f172a',
-            color: '#e2e8f0',
-            border: '1px solid #334155',
-            borderRadius: 4,
-            padding: '2px 6px',
-            fontSize: 12,
-            fontFamily: 'monospace',
-            outline: 'none',
-            zIndex: 100,
-          }}
-        />
+        <>
+          {/* Backdrop: clicking outside the input commits the edit */}
+          <div
+            style={{ position: 'fixed', inset: 0, zIndex: 99 }}
+            onPointerDown={commitConstEdit}
+          />
+          <input
+            autoFocus
+            type={nodes.find((n) => n.id === editingConst.nodeId)?.type === 'const/number' ? 'number' : 'text'}
+            value={editingConst.value}
+            onChange={(e) => setEditingConst((s) => s && { ...s, value: e.target.value })}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') commitConstEdit()
+              if (e.key === 'Escape') setEditingConst(null)
+            }}
+            style={{
+              position: 'fixed',
+              left: editingConst.screenX,
+              top: editingConst.screenY,
+              width: 130,
+              background: '#0f172a',
+              color: '#e2e8f0',
+              border: '2px solid #3b82f6',
+              borderRadius: 4,
+              padding: '3px 7px',
+              fontSize: 13,
+              fontFamily: 'monospace',
+              outline: 'none',
+              boxShadow: '0 0 0 3px rgba(59,130,246,0.25)',
+              zIndex: 100,
+            }}
+          />
+        </>
       )}
     </>
   )
